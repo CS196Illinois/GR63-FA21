@@ -103,6 +103,8 @@ for epoch in range(100):
         test_loss = 0
         test_hits = 0
         test_n = 0
+        all_loss = 0 
+        test_hits_alt = 0
         for (inputs, targets) in tqdm(test_dataloader, desc="Testing"):
             inputs = inputs.cuda()
             targets = targets.cuda().float()
@@ -113,26 +115,35 @@ for epoch in range(100):
             outs_2 = model(inputs[:,:,1::3])
             outs_3 = model(inputs[:,:,2::3])
             
-            mean_pred = torch.mean(torch.stack([outs_1, outs_2, outs_3]), dim=0)
+            loss_1 = bce_loss(outs_1, targets)
+            loss_2 = bce_loss(outs_2, targets)
+            loss_3 = bce_loss(outs_3, targets) 
+
+            all_loss += loss_1
+            all_loss += loss_2
+            all_loss += loss_3
+
+            mean_pred = torch.mean(torch.stack([F.sigmoid(outs_1), F.sigmoid(outs_2), F.sigmoid(outs_3)]), dim=0)
             mean_pred_r = torch.round(mean_pred)
             
-            outs_1_r = torch.round(outs_1)
-            outs_2_r = torch.round(outs_2)
-            outs_3_r = torch.round(outs_3)
+            outs_1_r = torch.round(F.sigmoid(outs_1))
+            outs_2_r = torch.round(F.sigmoid(outs_2))
+            outs_3_r = torch.round(F.sigmoid(outs_3))
             
-            outs_rounded = torch.round(outs)
+            outs_rounded = torch.round(outs_1_r + outs_2_r + outs_3_r)
  
-            loss = bce_loss(mean_pred, targets)
-    
+     #       loss = bce_loss(mean_pred, targets)
+             
             test_loss += loss/len(test_dataloader)
         
             test_hits += torch.sum(outs_rounded == targets)
             test_hits_alt += torch.sum(mean_pred_r == targets)
             
             test_n += len(targets)
+            print(outs_1, outs_2, outs_3, targets, mean_pred_r, outs_rounded)
 
         wandb.log({
-            'test_loss': test_loss,
+            'test_loss': test_loss/(3*test_loss),
             'test_acc': test_hits/test_n,
             'test_acc_alt': test_hits_alt/test_n
         })

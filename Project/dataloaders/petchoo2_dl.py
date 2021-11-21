@@ -29,7 +29,8 @@ class CustomImageDataset(Dataset):
         self.transforms = torch.nn.Sequential(
              transforms.RandomHorizontalFlip(),
              transforms.RandomResizedCrop((224, 224), scale=[.3, 1.], ratio=(.75, 1.33)),
-    )
+        )
+        self.val_transforms = transforms.RandomResizedCrop((224,224), scale=[1., 1.], ratio=(1., 1.))
         self.train = train
 
     def __len__(self):
@@ -51,5 +52,7 @@ class CustomImageDataset(Dataset):
         frame_data /= 255
         if self.train:
             frame_data = self.transforms(frame_data)
-        
+        else:
+            frame_data = self.val_transforms(frame_data)
+
         return frame_data, torch.tensor(label).float().unsqueeze(0) #  label?? # image, label

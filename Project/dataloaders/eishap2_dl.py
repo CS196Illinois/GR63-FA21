@@ -31,6 +31,9 @@ class CustomImageDataset(Dataset):
              transforms.RandomResizedCrop((224, 224), scale=[.4, 1.], ratio=(.75, 1.33)),
            #  transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     )
+        self.val_transforms = torch.nn.Sequential(
+                transforms.RandomResizedCrop((224,224), scale=[1., 1.], ratio=(1.,1.))
+                )
         self.train=train
 
     def __len__(self):
@@ -56,5 +59,6 @@ class CustomImageDataset(Dataset):
         
         if self.train:
             frame_data = self.transforms(frame_data)
-
+        else:
+            frame_data = self.val_transforms(frame_data)
         return frame_data, torch.tensor(label).float().unsqueeze(0) #  label?? # image, label
