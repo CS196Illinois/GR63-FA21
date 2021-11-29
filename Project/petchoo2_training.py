@@ -33,7 +33,7 @@ test_set = Dataset(FRAME_WINDOW, train=False)
 
 print(f"Finished Initializing Datasets of length:\nTrain: {len(train_set) }\n  Test: {len(test_set)}\n ")
 
-batch_size = 8
+batch_size = 20
 workers = 4
 
 train_dataloader = DataLoader(
@@ -48,7 +48,7 @@ train_dataloader = DataLoader(
 
 test_dataloader = DataLoader(
      test_set,
-     batch_size=16,
+     batch_size=64,
      shuffle=True,
      pin_memory=True,
      num_workers=1,
@@ -65,10 +65,10 @@ model = model.cuda()
 
 opt = optim.SGD(model.parameters(), lr = .003, momentum=.9)
 bce_loss = torch.nn.BCELoss()
-scheduler = optim.lr_scheduler.CosineAnnealingLR(opt, 6000, eta_min=.0001)
+scheduler = optim.lr_scheduler.CosineAnnealingLR(opt, 2000, eta_min=.0001)
 
 
-batch_factor = 2
+batch_factor = 3
 for epoch in range(10):
     opt.zero_grad()
     i = 0
