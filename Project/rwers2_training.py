@@ -15,7 +15,7 @@ from torch import nn
 import torch.optim as optim
 from tqdm import tqdm
 
-from models.rwers2_model import ViViT as Net
+from models.rwers2_model import CustomResNeXtPreAct as Net
 from dataloaders.rwers2_dl import CustomImageDataset as Dataset
 
 wandb.init(project='group63-violent-action')
@@ -33,7 +33,7 @@ test_set = Dataset(FRAME_WINDOW, train=False)
 
 print(f"Finished Initializing Datasets of length:\nTrain: {len(train_set) }\n  Test: {len(test_set)}\n ")
 
-batch_size = 12
+batch_size = 10
 workers = 8
 
 train_dataloader = DataLoader(
@@ -48,10 +48,10 @@ train_dataloader = DataLoader(
 
 test_dataloader = DataLoader(
      test_set,
-     batch_size=64,
+     batch_size=16,
      shuffle=False,
      pin_memory=True,
-     num_workers=1,
+     num_workers=4,
      persistent_workers=False,
      prefetch_factor=1 
  )
